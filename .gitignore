@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.env
+myenv/
+stockfish/
+stockfish-ubuntu-x86-64-avx2/
+*.tar
