@@ -3,17 +3,15 @@ import requests
 import json
 import chess
 import chess.pgn
-import chess.engine
 import io
 import math
 import os 
 from roaster.classifier import classify_move
+from services.engine_service import analyze_position
 
 
 
 app = Flask(__name__)
-
-engine = chess.engine.SimpleEngine.popen_uci("./stockfish/stockfish-ubuntu-x86-64-avx2")
 
 TOKEN = os.getenv("LICHESS_TOKEN")
 
@@ -137,72 +135,11 @@ def home():
 
             board.push(move)
 
-            result = engine.analyse(
-                board,
-                chess.engine.Limit(depth=12),
-                multipv=3
-            )
+            analysis_result = analyze_position(board)
 
-            best_eval = 0
+            best_eval = analysis_result["best_eval"]
 
-            for line in result:
-
-                score_obj = line["score"].white()
-
-                if score_obj.is_mate():
-
-                    mate = score_obj.mate()
-
-                    if mate > 0:
-                        score = f"M{mate}"
-                    else:
-                        score = f"-M{abs(mate)}"
-
-                else:
-
-                    score = score_obj.score()
-
-                    if score is None:
-                        score = 0
-
-                if line.get("multipv") == 1:
-                    best_eval = score
-
-                pv = line.get("pv")
-
-                line_board = board.copy()
-
-                pv_san = []
-
-                formatted_line = ""
-
-                if pv:
-
-                    move_number = line_board.fullmove_number
-
-                    is_white = line_board.turn == chess.WHITE
-
-                    for i, pv_move in enumerate(pv):
-
-                        san = line_board.san(pv_move)
-
-                        if line_board.turn == chess.WHITE:
-
-                            formatted_line += f"{line_board.fullmove_number}. {san} "
-
-                        else:
-
-                            if i == 0:
-                                formatted_line += f"{line_board.fullmove_number}... {san} "
-                            else:
-                                formatted_line += f"{san} "
-
-                        line_board.push(pv_move)
-
-                move_lines.append({
-                    "eval": score,
-                    "line": formatted_line.strip()
-                })
+            move_lines = analysis_result["lines"]
 
             evals.append(best_eval)
 
