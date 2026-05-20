@@ -85,13 +85,15 @@
         <div class = "right-panel">
             <div class="engine-line-card">
 
-                <h3>Engine Line</h3>
-
                 <div id="engline-line-container">
                     <div id="engine-lines">...</div>
                 </div>
                     
             </div>
+
+                <div class="opening-container" id="opening-name">
+                </div>
+
             <div class="move-table" id="move-table"></div>
         </div>
 
@@ -120,10 +122,33 @@
 
         var autoplay = null;
 
+        var moveData = {{ move_data | tojson }};
+
+        var openingName = {{ opening_name | tojson }};
+
         var board = Chessboard('board', {
+            draggable: true,
             position: 'start',
-            pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
+            pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
+            onDrop: onDrop
         });
+
+        function onDrop(source, target) {
+
+            let move = game.move({
+                from: source,
+                to: target,
+                promotion: 'q'
+            });
+
+            if (move === null) {
+                return 'snapback';
+            }
+
+            currentMove++;
+
+            updateBoard();
+        }
         
         function updateEvalBar() {
 
@@ -133,6 +158,34 @@
                 evalScore = evals[currentMove - 1];
             }
 
+            let whiteText = document.getElementById("eval-white-text");
+
+            let blackText = document.getElementById("eval-black-text");
+
+            whiteText.innerText = "";
+            blackText.innerText = "";
+
+            // HANDLE MATE SCORES
+            if (typeof evalScore === "string" && evalScore.includes("M")) {
+
+                if (evalScore.startsWith("-")) {
+
+                    document.getElementById("eval-white").style.height = "0%";
+
+                    blackText.innerText = evalScore;
+
+                } else {
+
+                    document.getElementById("eval-white").style.height = "100%";
+
+                    whiteText.innerText = "+" + evalScore;
+                }
+
+                return;
+            }
+
+            // NORMAL EVALS
+
             evalScore = Math.max(-1000, Math.min(1000, evalScore));
 
             let percentage = ((evalScore + 1000) / 2000) * 100;
@@ -141,14 +194,6 @@
                 percentage + "%";
 
             let displayEval = (evalScore / 100).toFixed(1);
-
-            let whiteText = document.getElementById("eval-white-text");
-
-            let blackText = document.getElementById("eval-black-text");
-
-            whiteText.innerText = "";
-
-            blackText.innerText = "";
 
             if (evalScore >= 0) {
 
@@ -178,6 +223,10 @@
 
                 let blackMove = sanMoves[i + 1] || "";
 
+                let whiteClassification = moveData[i]?.classification || "";
+
+                let blackClassification = moveData[i + 1]?.classification || "";
+
                 row.innerHTML = `
                     <div class="move-cell move-number">
                         ${moveNumber}
@@ -187,12 +236,20 @@
                         id="${currentMove === i + 1 ? 'current-move' : ''}"
                         onclick="jumpToMove(${i + 1})">
                         ${whiteMove}
+                        <img
+                            class="classification-icon"
+                            src="/static/images/classifications/${whiteClassification}.png"
+                        >
                     </div>
 
                     <div class="move-cell move-btn ${currentMove === i + 2 ? 'active-move' : ''}"
                         id="${currentMove === i + 2 ? 'current-move' : ''}"
                         onclick="jumpToMove(${i + 2})">
                         ${blackMove}
+                        <img
+                            class="classification-icon"
+                            src="/static/images/classifications/${blackClassification}.png"
+                        >
                     </div>
                 `;
 
@@ -245,7 +302,17 @@
 
             container.innerHTML = "";
 
+            let openingDiv = document.getElementById("opening-name");
+
             if (currentMove > 0) {
+
+                let currentOpening = moveData[currentMove - 1].opening;
+
+                if (currentOpening) {
+                    openingDiv.innerText = "Opening: " + currentOpening;
+                } else {
+                    openingDiv.innerText = "Opening: Unknown";
+                }
 
                 let currentLines = allLines[currentMove - 1];
 
@@ -256,7 +323,7 @@
 
                             <span class="engine-eval">
                                 ${lineData.eval > 0 ? "+" : ""}
-                                ${lineData.eval}
+                                ${lineData.eval/100}
                             </span>
 
                             <span class="engine-moves">
@@ -266,6 +333,9 @@
                         </div>
                     `;
                 });
+            }
+            else {
+                openingDiv.innerText = "";
             }
         }
 

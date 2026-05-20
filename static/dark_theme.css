@@ -208,7 +208,7 @@ button:active {
 }
 
 .engine-line-card {
-    margin-top: -70px;
+    margin-top: -110px;
     background: #161b22;
     border: 1px solid #30363d;
     border-radius: 10px;
@@ -270,8 +270,8 @@ button:active {
     border-radius: 10px;
     overflow: hidden;
     width: 400px;
-    margin-top: 275px;
-    height: 500px;
+    margin-top: 350px;
+    height: 440px;
     overflow-y: auto;
     overflow-x: hidden;
     position: absolute;
@@ -288,7 +288,7 @@ button:active {
 }
 
 .move-table::-webkit-scrollbar-thumb {
-    background: #30363d;
+    background: #3d5a8f;
     border-radius: 10px;
 }
 
@@ -301,7 +301,12 @@ button:active {
 }
 
 .engine-line::-webkit-scrollbar-thumb {
-    background: #30363d;
+    background: #3d5a8f;
+    border-radius: 10px;
+}
+
+.engine-line::-webkit-scrollbar-thumb:hover {
+    background: #58a6ff;
     border-radius: 10px;
 }
 
@@ -348,4 +353,33 @@ button:active {
 
 .move-row .move-cell:nth-child(1) {
     border-right: 1px solid #30363d;
+}
+
+.book {
+    background-color: rgba(88, 166, 255, 0.30);
+}
+
+.opening-container {
+    margin-top: 20px;
+    padding: 10px 15px;
+    background-color: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    color: #58a6ff;
+    font-weight: bold;
+    margin-left: -75px;
+}
+
+
+.classification-icon {
+    width: 25px;
+    height: 25px;
+    margin-left: auto;
+    border-radius: 50%;
+}
+
+.move-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
