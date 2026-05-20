@@ -112,25 +112,16 @@
 
     <script src="{{ url_for('static', filename='js/board.js') }}"></script>
 
-    <script>
-        
+    <script>   
 
         var moves = {{ moves | tojson }};
-
         var evals = {{ evals | tojson }};
-
         var allLines = {{ all_lines | tojson }};
-
         var game = new Chess();
-
         var currentMove = 0;
-
         var sanMoves = {{ san_moves | tojson }};
-
         var autoplay = null;
-
         var moveData = {{ move_data | tojson }};
-
         var openingName = {{ opening_name | tojson }};
 
         var board = Chessboard('board', {
@@ -139,7 +130,6 @@
             pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
             onDrop: onDrop
         });
-        
 
         window.onload = function () {
 
@@ -147,7 +137,6 @@
 
             updateBoard();
         };
-
 
     </script>
 </body>
