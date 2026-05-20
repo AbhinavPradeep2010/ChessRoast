@@ -4,7 +4,7 @@ import io
 
 from services.engine_service import analyze_position
 from services.opening_service import is_book_move, get_opening_name
-from roaster.classifier import classify_move
+from utils.classifier import classify_move
 
 
 def analyze_game(pgn_text):
